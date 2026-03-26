@@ -33,7 +33,6 @@
         .fleet-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 20px; }
         .fleet-card { background: var(--bg-card); border-radius: 12px; overflow: hidden; border: 1px solid #1f2937; margin-bottom: 10px; }
         .fleet-img { width: 100%; height: 200px; object-fit: cover; }
-        /* Text Fix: Changed to White */
         .fleet-info { padding: 15px; text-align: center; background: #050b14; border-top: 1px solid #1f2937; color: white; }
         .fleet-info h4 { margin: 0; font-size: 1.2rem; color: #fff; }
         .fleet-info p { margin: 5px 0 0; font-size: 0.9rem; color: #d1d5db; }
@@ -75,9 +74,6 @@
         <button id="btn-air" class="tab-btn" onclick="setCalcMode('airport')">Airport</button>
     </div>
     <div class="fare-box">
-        <input type="text" id="custName" placeholder="Your Name">
-        <input type="tel" id="custMobile" placeholder="WhatsApp Number">
-
         <div id="city-air-fields">
             <input type="number" id="approxKm" placeholder="Approx Distance in KM">
         </div>
@@ -160,12 +156,11 @@ function calculateFare() {
     if(currentMode === 'oneway') {
         const from = document.getElementById('fromCitySelect').value, to = document.getElementById('toCitySelect').value;
         const [la1, lo1] = cityData[from], [la2, lo2] = cityData[to];
-        // Corrected distance multiplier from 1.65 to 1.25 for more accuracy
-        dist = Math.round(6371 * 2 * Math.atan2(Math.sqrt(Math.sin(((la2-la1)*Math.PI/180)/2)**2 + Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(((lo2-lo1)*Math.PI/180)/2)**2), Math.sqrt(1-(Math.sin(((la2-la1)*Math.PI/180)/2)**2 + Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(((lo2-lo1)*Math.PI/180)/2)**2))) * 1.25);
+        dist = Math.round(6371 * 2 * Math.atan2(Math.sqrt(Math.sin(((la2-la1)*Math.PI/180)/2)**2 + Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(((lo2-lo1)*Math.PI/180)/2)**2), Math.sqrt(1-(Math.sin(((la2-la1)*Math.PI/180)/2)**2 + Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(((lo2-lo1)*Math.PI/180)/2)**2))) * 1.12);
         
         const type = document.querySelector('input[name="tripType"]:checked').value;
         if(type === 'oneway') { 
-            dist = Math.max(dist, 130); 
+            if(dist < 130) dist = 130;
             price = (dist * ratePerKm) + 500; 
         } else { 
             dist = dist * 2; 
@@ -174,22 +169,19 @@ function calculateFare() {
     } else {
         dist = parseFloat(document.getElementById('approxKm').value);
         if(!dist) return alert("Please enter Approx KM");
-        // Variable pricing for City rides based on car selection
         const baseFare = (currentMode === 'city' ? 75 : 120);
-        const perKmCharge = ratePerKm + 10; // Extra charge for premium cars in city
-        price = baseFare + (dist * perKmCharge);
+        price = baseFare + (dist * (ratePerKm + 10));
     }
     
     const resDiv = document.getElementById("fareResult");
-    resDiv.innerHTML = `Trip Distance: ${dist} KM<br>Estimated Fare: ₹${Math.round(price)}`;
+    resDiv.innerHTML = `Trip Distance: ${dist} KM<br>Estimated Total Fare: ₹${Math.round(price)}`;
     resDiv.style.display = "block";
     document.getElementById('confirmBookingBtn').style.display = 'flex';
 }
 
 function confirmBooking() {
-    const name = document.getElementById('custName').value || 'Guest', mobile = document.getElementById('custMobile').value || 'N/A';
     const detail = document.getElementById('fareResult').innerText.replace(/\n/g, ' ');
-    window.open(`https://wa.me/916369879966?text=${encodeURIComponent("*Quicktaxi Inquiry*\nName: "+name+"\nMobile: "+mobile+"\n"+detail)}`, '_blank');
+    window.open(`https://wa.me/916369879966?text=${encodeURIComponent("*Quicktaxi Booking Inquiry*\n"+detail)}`, '_blank');
 }
 init();
 </script>
