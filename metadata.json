@@ -1,0 +1,10 @@
+{
+  "name": "Quicktaxi Coimbatore",
+  "description": "Premium outstation and local taxi service in Coimbatore with live fare calculator, fleet options, and tour packages.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
